@@ -16,14 +16,48 @@
 # -l | --lowercase: to lowercase
 # -a | --ascii: to ascii
 # -t | --test: test mode
+# -v | --verbose: verbose mode
+# --help: print help info 
 ###############################################################################
+
+
+# ShowHelp function
+###############################################################################
+function ShowHelp()
+{
+	echo "\`·.,¸,.·*¯\`·.,¸,.·*·.╭━━━━━━━╮"
+	echo "\`·.,¸,.·*¯\`·.,¸,.·*·.|::::::::/\__|\\"
+	echo "\`·.,¸,.·*¯\`·.,¸,.·*·╰|:::::::(◕ ᴥ ◕ )"
+	echo "\`·.,¸,.·*¯\`·.,¸,.-·*··u-u━━━-u--u"
+	echo ""
+	echo "Usage: njann [OPTION]... FILE..."
+	echo "Rename FILE according to options."
+	echo "If no argument is specified renames to uppercase."	
+	echo ""
+	echo "   -r, --recursive                rename files recursively"
+	echo "   -u, --uppercase                change file names to uppercase"
+	echo "   -l, --lowercase                change file names to lowercase"
+	echo "   -a, --ascii                    change file names to ascii only"
+	echo "   -t, --test                     do not change the file names"
+	echo "   -v, --verbose                  explain what is being done"
+	echo "       --help                     display this help and exit"
+	echo ""
+	echo "The options can be mixed in any way, but -l and -u can not be"
+	echo "given together."
+	echo ""
+	echo "Exit status:"
+	echo " 0  if no file name would be changed,"
+	echo " 1  if some file name would be changed,"
+	echo " 2  if there was some error."
+	
+}
 
 # Normalization functions
 ###############################################################################
 function Uppercase()
 {
 	res=$(echo "$1" | tr '[a-z]' '[A-Z]')
-	res=$(echo "$res" | sed -e 's/á/Á/g;s/é/É/g;s/í/Í/g;s/ó/Ó/g;s/ú/Ú/g;s/ñ/Ñ/g;s/ç/Ç/g;')
+	res=$(echo "$res" | sed -e 's/á/Á/g;s/é/É/g;s/í/Í/g;s/ó/Ó/g;s/ú/Ú/g;s/ñ/Ñ/g;s/ç/Ç/g;s/ü/Ü/g;')
 	echo "$res"
 }
 
@@ -37,7 +71,7 @@ function UppercaseASCII()
 function Lowercase()
 {
 	res=$(echo "$1" | tr '[A-Z]' '[a-z]')
-	res=$(echo "$res" | sed -e 's/Á/á/g;s/É/é/g;s/Í/í/g;s/Ó/ó/g;s/Ú/ú/g;s/Ñ/ñ/g;s/Ç/ç/g;')
+	res=$(echo "$res" | sed -e 's/Á/á/g;s/É/é/g;s/Í/í/g;s/Ó/ó/g;s/Ú/ú/g;s/Ñ/ñ/g;s/Ç/ç/g;s/Ü/ü/g;')
 	echo "$res"
 }
 
@@ -111,15 +145,25 @@ function NormalizeFile
 		if [ "$basename" != "$new_basename" ] ; then
 			if [ "$test" = 0 ] ; then
 				# This is not a test, rename the file.
-				mv "$dirname/$basename" "$dirname/$new_basename"
-
+				mv "$dirname/$basename" "$dirname/$new_basename"		
+				# If there was an error changing the file name, then
+				# we return error too
+				if [ "$?" != 0 ] ; then
+					let return_value=2
+				fi								 
 				file="$dirname/$new_basename"
 			fi
-			echo "$dirname/$basename -> $dirname/$new_basename: $?";
+			if [ "$verbose" = 1 ] ; then
+				echo "$dirname/$basename -> $dirname/$new_basename";
+			fi
 			#If a file/directory is or would be modified return 1
-			let return_value=1
+			if [  "$return_value" != 2 ] ; then
+				let return_value=1
+			fi
 		else
-			echo "$dirname/$basename permanece igual"
+			if [ "$verbose" = 1 ] ; then
+				echo "$dirname/$basename does not change"
+			fi
 		fi
 	else
 		echo "File ($file) does not exists" >&2
@@ -133,7 +177,7 @@ function NormalizeFile
 		file=$(DeleteFinalSlash "$file")
 
 		if [[ -z $(ls -A "$file") ]] ; then
-			echo "El directorio ("$file") esta vacio"
+			#echo "El directorio ("$file") esta vacio"
 			return
 		fi
 
@@ -142,7 +186,7 @@ function NormalizeFile
 			NormalizeFile "$file2" "$transformation" "$recursive" "$test"
 			# If there would be a modification inside the directory
 			# make sure the script returns 1
-			if [ "$?" = 1 ] ; then
+			if [ "$?" = 1 ] && [  "$return_value" != 2 ] ; then
 				let return_value=1
 			fi
 		done
@@ -157,7 +201,7 @@ function NormalizeFile
 
 #Getopt get with -o the short options, each char is an option, with -l long options
 #with -n the name to print when an error occurs and -- the arguments to be processed
-arguments=$(getopt -o rulat -l "recursive,uppercase,lowercase,ascii,test" -n "p0_7.sh" -- "$@" )
+arguments=$(getopt -o rulatv -l "recursive,uppercase,lowercase,ascii,test,verbose,help" -n "njann" -- "$@" )
 
 # getopt returns a string in the form:
 # -a -b ... --long1 ...  --longn -- 'arg1' ... 'argn'
@@ -167,8 +211,10 @@ let lowercase=0
 let ascii=0
 let recursive=0
 let test=0
+let verbose=0
+let help=0
 # 0 means no file was o would be modified
-((return_value = 0))
+let return_value0
 # Iterate through argument list until -- delimeter and count how many arguments are
 let index=1
 for k in $arguments
@@ -185,10 +231,19 @@ do
 			ascii=1;;
 		"-t"|"--test")
 			test=1;;			
+		"-v"|"--verbose")
+			verbose=1;;		
+		"--help")
+			help=1;;							
 		"--")
 			break;;				
 	esac
 done
+
+if [ "$help" = 1 ] ; then
+	ShowHelp
+	exit 0
+fi	 
 
 # If no transformation is specified, use the "uppercase" option.
 if [ "$uppercase" = 0 ] && [ "$lowercase" = 0 ] && [ "$ascii" = 0 ] ; then
@@ -233,7 +288,7 @@ elif [ "$ascii" = 1 ] ; then
 	transformation="ASCII"
 fi
 
-echo "Operation: $transformation";
+#echo "Operation: $transformation";
 
 let k=2
 file=$(echo "$files" | cut -d"'" -f2)
@@ -243,7 +298,7 @@ do
 	if [ "$file" != " " ] ; then
 		file=$( DeleteFinalSlash "$file" )
 		NormalizeFile "$file" "$transformation" "$recursive" "$test"
-		return_value=$?
+		return_value="$?"
 	fi
 	let k=k+1
 	# Get next file or '
