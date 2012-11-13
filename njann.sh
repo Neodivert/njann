@@ -46,8 +46,8 @@ function ShowHelp()
 	echo "given together."
 	echo ""
 	echo "Exit status:"
-	echo " 0  if no file name would be changed,"
-	echo " 1  if some file name would be changed,"
+	echo " 0  if no file name was/would be changed,"
+	echo " 1  if some file name was/would be changed,"
 	echo " 2  if there was some error."
 	
 }
@@ -266,7 +266,7 @@ files=$(echo "$arguments" | cut -d" " -f$index-)
 if [ "$files" = "--" ]
 then
 	# No file was given to the script
-	echo "Script usage is: ${0##*/} [options] file [more_files]" >&2
+	echo "Usage: njann [OPTION]... FILE..." >&2
 	exit 2
 fi
 
