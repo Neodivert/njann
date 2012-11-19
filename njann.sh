@@ -21,6 +21,14 @@
 ###############################################################################
 
 
+# ShowUsage function
+###############################################################################
+function ShowUsage()
+{
+	echo "Usage: njann [OPTION]... FILE..."
+	echo "Try \`njann --help\` for more information"
+}
+
 # ShowHelp function
 ###############################################################################
 function ShowHelp()
@@ -266,7 +274,7 @@ files=$(echo "$arguments" | cut -d" " -f$index-)
 if [ "$files" = "--" ]
 then
 	# No file was given to the script
-	echo "Usage: njann [OPTION]... FILE..." >&2
+	ShowUsage >&2 
 	exit 2
 fi
 
