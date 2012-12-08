@@ -48,7 +48,7 @@ function ShowHelp()
 	echo "   -a, --ascii                    change file names to ascii only"
 	echo "   -t, --test                     do not change the file names"
 	echo "   -v, --verbose                  explain what is being done"
-	echo "       --help                     display this help and exit"
+	echo "   -h, --help                     display this help and exit"
 	echo ""
 	echo "The options can be mixed in any way, but -l and -u can not be"
 	echo "given together."
@@ -209,7 +209,7 @@ function NormalizeFile
 
 #Getopt get with -o the short options, each char is an option, with -l long options
 #with -n the name to print when an error occurs and -- the arguments to be processed
-arguments=$(getopt -o rulatv -l "recursive,uppercase,lowercase,ascii,test,verbose,help" -n "njann" -- "$@" )
+arguments=$(getopt -o rulatvh -l "recursive,uppercase,lowercase,ascii,test,verbose,help" -n "njann" -- "$@" )
 
 # getopt returns a string in the form:
 # -a -b ... --long1 ...  --longn -- 'arg1' ... 'argn'
@@ -241,7 +241,7 @@ do
 			test=1;;			
 		"-v"|"--verbose")
 			verbose=1;;		
-		"--help")
+		"-h"|"--help")
 			help=1;;							
 		"--")
 			break;;				
