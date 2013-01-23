@@ -1,12 +1,12 @@
 njann
 =====
-GNU/Linux script para la normalización de nombres de ficheros.
+Script de GNU/Linux para la normalización de nombres de ficheros.
 
 Info consultada para crear el RPM.
 ===
-http://www.ibiblio.org/pub/linux/docs/howto/other-formats/html_single/RPM-HOWTO.html
-http://fedoraproject.org/wiki/RPMGroups
-http://meinit.nl/making-rpm-shell-script -> Fuente principal.
+- http://www.ibiblio.org/pub/linux/docs/howto/other-formats/html_single/RPM-HOWTO.html
+- http://fedoraproject.org/wiki/RPMGroups
+- http://meinit.nl/making-rpm-shell-script -> Fuente principal.
 
 Pasos para generar el paquete.
 ===
