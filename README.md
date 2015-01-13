@@ -1,6 +1,10 @@
-# njann - Not Just Another Names Normalizer.
+# njann - Not Just Another Names Normalizer
 
 Script de GNU/Linux para la normalización de nombres de ficheros.
+
+## Estado actual del proyecto
+
+** Proyecto completado **
 
 ## Info consultada para crear el RPM.
 
