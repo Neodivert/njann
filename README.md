@@ -4,7 +4,7 @@ Script de GNU/Linux para la normalización de nombres de ficheros.
 
 ## Estado actual del proyecto
 
-** Proyecto completado **
+**Proyecto completado**
 
 ## Info consultada para crear el RPM.
 
